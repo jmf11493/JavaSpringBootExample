@@ -86,7 +86,7 @@ public class EmployeeServiceImplTest {
         assertEquals(expected.getPosition(), actual.getPosition());
     }
 
-    
+
     @Test
     public void testNumberOfDirectReports() {
         Employee testEmployee = new Employee();
