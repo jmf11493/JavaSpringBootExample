@@ -15,6 +15,9 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringRunner;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
@@ -60,7 +63,6 @@ public class EmployeeServiceImplTest {
         assertEquals(createdEmployee.getEmployeeId(), readEmployee.getEmployeeId());
         assertEmployeeEquivalence(createdEmployee, readEmployee);
 
-
         // Update checks
         readEmployee.setPosition("Development Manager");
 
@@ -83,4 +85,55 @@ public class EmployeeServiceImplTest {
         assertEquals(expected.getDepartment(), actual.getDepartment());
         assertEquals(expected.getPosition(), actual.getPosition());
     }
+
+    
+    @Test
+    public void testNumberOfDirectReports() {
+        Employee testEmployee = new Employee();
+        testEmployee.setFirstName("John");
+        testEmployee.setLastName("Doe");
+        testEmployee.setDepartment("Executive");
+        testEmployee.setPosition("CEO");
+
+        int numberOfDirectReports = 5;
+        int numberOfReportsForDirectReports = 3;
+        int expectedNumberOfReports = (numberOfDirectReports * numberOfReportsForDirectReports) + numberOfDirectReports;
+
+        List<Employee> directReports = createAnyNumberOfEmployees(numberOfDirectReports, numberOfReportsForDirectReports);
+        testEmployee.setDirectReports(directReports);
+
+        // Begin Test
+        Employee createdEmployee = restTemplate.postForEntity(employeeUrl, testEmployee, Employee.class).getBody();
+        int numberOfReports = employeeService.getNumberOfReports(createdEmployee.getEmployeeId());
+        assertEquals(expectedNumberOfReports, numberOfReports);
+    }
+
+
+    private List<Employee> createAnyNumberOfEmployees(int numberOfEmployees, int numberOfDirectReports) {
+        int start = 0;
+        List<Employee> newEmployees = new ArrayList<>();
+
+        if (numberOfEmployees > 0) {
+            while (start < numberOfEmployees) {
+                Employee testEmployee = new Employee();
+
+                testEmployee.setFirstName("John");
+                testEmployee.setLastName("Doe");
+                testEmployee.setDepartment("Engineering");
+                testEmployee.setPosition("Developer");
+
+                if (numberOfDirectReports > 0) {
+                    List<Employee> directReports = createAnyNumberOfEmployees(numberOfDirectReports, 0);
+                    testEmployee.setDirectReports(directReports);
+                }
+
+                newEmployees.add(testEmployee);
+
+                start++;
+            }
+        }
+
+        return newEmployees;
+    }
 }
+

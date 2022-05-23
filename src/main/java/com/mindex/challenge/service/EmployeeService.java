@@ -6,4 +6,6 @@ public interface EmployeeService {
     Employee create(Employee employee);
     Employee read(String id);
     Employee update(Employee employee);
+
+    int getNumberOfReports(String id);
 }
